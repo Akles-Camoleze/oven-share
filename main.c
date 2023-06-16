@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include "entities/student/student.h"
 
 int main() {
-    printf("Hello, World!\n");
+    create_students();
     return 0;
 }
