@@ -15,31 +15,39 @@ pthread_cond_t initilize = PTHREAD_COND_INITIALIZER;
 
 void *task(void *argument) {
     Student *student = (Student *) argument;
-//    pthread_mutex_lock(&mutex);
-//    student_init++;
-//    pthread_cond_wait(&initilize, &mutex);
-//    pthread_mutex_unlock(&mutex);
+
+    //broadcast
+    pthread_mutex_lock(&mutex);
+    student_init++;
+    pthread_cond_wait(&initilize, &mutex);
+    pthread_mutex_unlock(&mutex);
 
     for (int i = 0; i < 2; i++) {
         sleep(rand() % 2 + 3);
+
+        //entrando na fila
         pthread_mutex_lock(&list_mutex);
         handler(list, student, &list_mutex);
         pthread_mutex_unlock(&list_mutex);
 
         pthread_mutex_lock(&oven_mutex);
+
         printf("\n%s esta usando o forno", student->name);
         fflush(stdout);
         sleep(1);
+
         pthread_mutex_lock(&list_mutex);
-        unlist(list, student->name);
+        printf("\n%s libera o forno", unlist(list, student->name)->student.name);
+        student->turn = false;
+        fflush(stdout);
         if (!empty(list)) {
+            list->node->student.turn = true;
             printf("\nEmitiu signal para %lu", list->node->student.id);
             pthread_cond_signal(&list->node->student.condition);
         }
-        fflush(stdout);
-        printf("\n%s libera o forno", student->name);
         pthread_mutex_unlock(&oven_mutex);
         pthread_mutex_unlock(&list_mutex);
+
     }
 
     pthread_exit(NULL);
@@ -58,8 +66,8 @@ int main(int argc, char **argv) {
         assert(rc == 0);
     }
 
-//    while (student_init < STUDENTS_QUANTITY);
-//    pthread_cond_broadcast(&initilize);
+    while (student_init < STUDENTS_QUANTITY);
+    pthread_cond_broadcast(&initilize);
 
     for (int i = 0; i < STUDENTS_QUANTITY; ++i) {
         rc = pthread_join(students[i].id, NULL);

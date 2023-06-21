@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
 #include "names.h"
@@ -12,6 +13,7 @@
 typedef struct Student {
     int waiting;
     char *name;
+    bool turn;
     pthread_t id;
     Level level;
     Level level_backup;

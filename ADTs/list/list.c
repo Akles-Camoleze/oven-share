@@ -30,7 +30,7 @@ void to_list(List *list, Student *student, int index) {
         current = current->next;
     }
     node->next = current;
-    !empty(list) ? (prev->next = node) : (list->node = node);
+    index != 0 ? (prev->next = node) : (list->node = node);
     list->size++;
 }
 
@@ -58,15 +58,17 @@ int get_index(List *list, Level level) {
         aux = aux->next;
         i++;
     }
-    return i + 1;
+    return i;
 }
 
 void handler(List *list, Student *student, pthread_mutex_t *mutex) {
+    if (empty(list)) student->turn = true;
     int index = get_index(list, student->level);
     to_list(list, student, index);
     printf("\n%s entra na fila - Id = %lu - Fila = %lu", student->name, student->id, list->node->student.id);
     fflush(stdout);
-    while(list->node->student.id != student->id) {
+    while(!student->turn) {
+        printf("\nEsperando o signal %lu", student->id);
         pthread_cond_wait(&student->condition, mutex);
         printf("\nCapturei o signal %lu", student->id);
     }
