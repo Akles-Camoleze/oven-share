@@ -30,6 +30,6 @@ Node *unlist(List *list, char *name);
 
 int get_index(List *list, Level level);
 
-void handler(List *list, Student *student, pthread_mutex_t *mutex);
+void handler(List *list, Student *student, pthread_mutex_t *list_mutex, pthread_mutex_t *oven_mutex);
 
 #endif //OVEN_SHARE_LIST_H

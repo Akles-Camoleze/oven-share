@@ -6,6 +6,13 @@
 #include "entities/student/student.h"
 #include "ADTs/list/list.h"
 
+/*
+ * Trancar a mutex do forno
+ * Verificar se a fila esta vazia, caso sim, entrar na fila, usar, sair da fila e emitir signal para o proximo
+ * Caso nao estiver vazia, verificar se é o primeiro, se for, usar, sair da fila e emitir o signal para o proximo
+ * Caso nao seja o primeiro dar um wait
+ * */
+
 int student_init;
 List *list;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -26,11 +33,10 @@ void *task(void *argument) {
         sleep(rand() % 2 + 3);
 
         //entrando na fila
-        pthread_mutex_lock(&list_mutex);
-        handler(list, student, &list_mutex);
-        pthread_mutex_unlock(&list_mutex);
+//        pthread_mutex_lock(&list_mutex);
+        handler(list, student, &list_mutex, &oven_mutex);
+//        pthread_mutex_unlock(&list_mutex);
 
-        pthread_mutex_lock(&oven_mutex);
 
         printf("\n%s esta usando o forno", student->name);
         fflush(stdout);
@@ -45,11 +51,10 @@ void *task(void *argument) {
             printf("\nEmitiu signal para %lu", list->node->student.id);
             pthread_cond_signal(&list->node->student.condition);
         }
-        pthread_mutex_unlock(&oven_mutex);
         pthread_mutex_unlock(&list_mutex);
+        pthread_mutex_unlock(&oven_mutex);
 
     }
-
     pthread_exit(NULL);
 }
 
