@@ -8,10 +8,10 @@
 
 /*
  * Trancar a mutex do forno
- * Verificar se a fila esta vazia, caso sim, entrar na fila, usar, sair da fila e emitir signal para o proximo
+ * Verificar se a fila esta vazia, caso, sim, entrar na fila, usar, sair da fila e emitir signal para o proximo
  * Caso nao estiver vazia, verificar se é o primeiro, se for, usar, sair da fila e emitir o signal para o proximo
  * Caso nao seja o primeiro dar um wait
- * */
+ */
 
 int student_init;
 List *list;
@@ -28,26 +28,42 @@ void *task(void *argument) {
     student_init++;
     pthread_cond_wait(&initilize, &mutex);
     pthread_mutex_unlock(&mutex);
-
+/*
+ * Trancar a mutex do forno
+ * Verificar se a fila esta vazia, caso, sim, entrar na fila, usar, sair da fila e emitir signal para o proximo
+ * Caso nao estiver vazia, verificar se é o primeiro, se for, usar, sair da fila e emitir o signal para o proximo
+ * Caso nao seja o primeiro dar um wait
+ */
     for (int i = 0; i < 2; i++) {
         sleep(rand() % 2 + 3);
 
-        //entrando na fila
-//        pthread_mutex_lock(&list_mutex);
-        handler(list, student, &list_mutex, &oven_mutex);
-//        pthread_mutex_unlock(&list_mutex);
+        pthread_mutex_lock(&list_mutex);
+        int index = get_index(list, student->level);
+        to_list(list, student, index);
+        printf("\n%s entra na fila - Id = %lu - Fila = %lu",
+               student->name,
+               student->id,
+               list->node->student.id
+        );
+        pthread_mutex_unlock(&list_mutex);
 
+        pthread_mutex_lock(&oven_mutex);
+
+        pthread_mutex_lock(&list_mutex);
+        if ((!empty(list) && list->node->student.id != student->id)) {
+            pthread_mutex_unlock(&list_mutex);
+            pthread_cond_wait(&student->condition, &oven_mutex);
+            pthread_mutex_lock(&list_mutex);
+        }
+        unlist(list, student->name);
+        pthread_mutex_unlock(&list_mutex);
 
         printf("\n%s esta usando o forno", student->name);
-        fflush(stdout);
         sleep(1);
 
         pthread_mutex_lock(&list_mutex);
-        printf("\n%s libera o forno", unlist(list, student->name)->student.name);
-        student->turn = false;
-        fflush(stdout);
+        printf("\n%s libera o forno", student->name);
         if (!empty(list)) {
-            list->node->student.turn = true;
             printf("\nEmitiu signal para %lu", list->node->student.id);
             pthread_cond_signal(&list->node->student.condition);
         }

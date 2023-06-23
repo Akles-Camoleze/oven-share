@@ -16,8 +16,9 @@ Node *new_node(Student *student) {
 
 List *new_list() {
     List *new_list = (List *) malloc(sizeof(List));
-    new_list->node = NULL;
     new_list->size = 0;
+    new_list->node = NULL;
+    new_list->oven_student = NULL;
     return new_list;
 }
 
@@ -63,17 +64,18 @@ int get_index(List *list, Level level) {
 
 void handler(List *list, Student *student, pthread_mutex_t *list_mutex, pthread_mutex_t *oven_mutex) {
     pthread_mutex_lock(list_mutex);
-    if (empty(list)) student->turn = true;
+    if (empty(list));
     int index = get_index(list, student->level);
     to_list(list, student, index);
     printf("\n%s entra na fila - Id = %lu - Fila = %lu", student->name, student->id, list->node->student.id);
     fflush(stdout);
     pthread_mutex_unlock(list_mutex);
+
     pthread_mutex_lock(oven_mutex);
-    if(!student->turn) {
-        printf("\nEsperando o signal %lu", student->id);
-        pthread_cond_wait(&student->condition, oven_mutex);
-        printf("\nCapturei o signal %lu", student->id);
-    }
+//    if(!student->turn) {
+//        printf("\nEsperando o signal %lu", student->id);
+//        pthread_cond_wait(&student->condition, oven_mutex);
+//        printf("\nCapturei o signal %lu", student->id);
+//    }
     printf("\nProssegui");
 }

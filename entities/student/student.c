@@ -7,7 +7,7 @@ Student *new_student(char *name, Level level) {
     student->waiting = 0;
     student->name = strdup(name);
     student->level = level;
-    student->turn = false;
+//    student->turn = false;
     pthread_cond_init(&student->condition, NULL);
     student_id++;
 

@@ -13,7 +13,6 @@
 typedef struct Student {
     int waiting;
     char *name;
-    bool turn;
     pthread_t id;
     Level level;
     Level level_backup;

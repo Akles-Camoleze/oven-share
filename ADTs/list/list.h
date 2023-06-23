@@ -12,8 +12,9 @@ typedef struct Node {
 } Node;
 
 typedef struct List {
-    Node *node;
     int size;
+    Node *node;
+    Student *oven_student;
 } List;
 
 Node *new_node(Student *student);
