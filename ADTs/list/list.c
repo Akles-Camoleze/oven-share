@@ -24,6 +24,7 @@ List *new_list() {
 
 void to_list(List *list, Student *student, int index) {
     if (full(list)) return;
+    if (list->oven_student == NULL) list->oven_student = student->id;
     Node *current = list->node, *prev = list->node;
     Node *node = new_node(student);
     for (int i = 0; i < index && current != NULL; i++) {
@@ -38,7 +39,7 @@ void to_list(List *list, Student *student, int index) {
 Node *unlist(List *list, char *name) {
     if (empty(list)) return NULL;
     Node *current = list->node, *prev = list->node;
-    while(current != NULL && strcmp(current->student.name, name) != 0) {
+    while (current != NULL && strcmp(current->student.name, name) != 0) {
         prev = current;
         current = current->next;
     }
@@ -48,14 +49,13 @@ Node *unlist(List *list, char *name) {
     }
     prev->next = current->next;
     list->size--;
-
     return current;
 }
 
 int get_index(List *list, Level level) {
     int i = 0;
     Node *aux = list->node;
-    while (aux != NULL && level >= aux->student.level) {
+    while (aux != NULL && (level >= aux->student.level || list->oven_student == aux->student.id)) {
         aux = aux->next;
         i++;
     }

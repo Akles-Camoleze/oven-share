@@ -14,7 +14,7 @@ typedef struct Node {
 typedef struct List {
     int size;
     Node *node;
-    Student *oven_student;
+    pthread_t oven_student;
 } List;
 
 Node *new_node(Student *student);
