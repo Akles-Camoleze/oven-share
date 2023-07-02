@@ -61,3 +61,42 @@ int get_index(List *list, Level level) {
     }
     return i;
 }
+
+int input(List *list, Student *student) {
+    int index = get_index(list, student->level);
+    to_list(list, student, index);
+    printf("\n%s entra na fila", student->name);
+    fflush(stdout);
+    return COD_IN;
+}
+
+int output(List *list, Student *student) {
+    unlist(list, student->name);
+    if (!empty(list)) {
+        list->oven_student = list->node->student.id;
+        int rc = pthread_cond_signal(list->node->student.condition);
+        assert(rc == 0);
+    } else {
+        list->oven_student = -1;
+    }
+    printf("\n%s libera o forno", student->name);
+    fflush(stdout);
+
+    return COD_OUT;
+}
+
+void wait_turn(List *list, Student *student, pthread_mutex_t *list_mutex) {
+    if (list->oven_student != student->id) {
+        int rc = pthread_cond_wait(student->condition, list_mutex);
+        assert(rc == 0);
+    }
+}
+
+void handler(pthread_mutex_t *list_mutex, List *list, Student *student, int (*operation)(List *, Student *)) {
+    pthread_mutex_lock(list_mutex);
+    if (operation(list, student)) {
+        wait_turn(list, student, list_mutex);
+    }
+    pthread_mutex_unlock(list_mutex);
+}
+

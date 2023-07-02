@@ -1,6 +1,7 @@
 #ifndef OVEN_SHARE_LIST_H
 #define OVEN_SHARE_LIST_H
-
+#define COD_OUT 0
+#define COD_IN 1
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -31,6 +32,10 @@ Node *unlist(List *list, char *name);
 
 int get_index(List *list, Level level);
 
-void handler(List *list, Student *student, pthread_mutex_t *list_mutex, pthread_mutex_t *oven_mutex);
+int input(List *list, Student *student);
+
+int output(List *list, Student *student);
+
+void handler(pthread_mutex_t *list_mutex, List *list, Student *student, int (*operation)(List *, Student *));
 
 #endif //OVEN_SHARE_LIST_H
