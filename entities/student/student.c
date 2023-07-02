@@ -1,15 +1,13 @@
 #include "student.h"
-int student_id = 1;
 
 Student *new_student(char *name, Level level) {
     Student *student = (Student *) malloc(sizeof(Student));
-    student->id = student_id;
+    student->condition = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
+    int rc = pthread_cond_init(student->condition, NULL);
+    assert(rc == 0);
     student->waiting = 0;
     student->name = strdup(name);
     student->level = level;
-//    student->turn = false;
-    pthread_cond_init(&student->condition, NULL);
-    student_id++;
 
     return student;
 }

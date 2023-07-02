@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
+#include <assert.h>
 #include "names.h"
 #include "../../enums/level/level.enum.h"
 
@@ -16,7 +17,7 @@ typedef struct Student {
     pthread_t id;
     Level level;
     Level level_backup;
-    pthread_cond_t condition;
+    pthread_cond_t *condition;
 } Student;
 
 Student *new_student(char* name, Level level);
