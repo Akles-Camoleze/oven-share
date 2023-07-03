@@ -8,6 +8,7 @@ Student *new_student(char *name, Level level) {
     student->waiting = 0;
     student->name = strdup(name);
     student->level = level;
+    student->level_backup = level;
 
     return student;
 }
@@ -20,4 +21,9 @@ void create_students(Student *students) {
         students[i * 2 + 1] = *new_student(names[i * 2 + 1], current_level);
         current_level++;
     }
+}
+
+void reset_attr(Student *student) {
+    student->waiting = 0;
+    student->level = student->level_backup;
 }

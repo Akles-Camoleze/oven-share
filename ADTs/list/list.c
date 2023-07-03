@@ -11,6 +11,7 @@ bool full(List *list) {
 Node *new_node(Student *student) {
     Node *node = (Node *) malloc(sizeof(Node));
     node->student = *student;
+    node->next = NULL;
     return node;
 }
 
@@ -22,17 +23,22 @@ List *new_list() {
     return new_list;
 }
 
-void to_list(List *list, Student *student, int index) {
+void to_list(List *list, Student *student) {
     if (full(list)) return;
     if (list->oven_student == -1) list->oven_student = student->id;
-    Node *current = list->node, *prev = list->node;
     Node *node = new_node(student);
-    for (int i = 0; i < index && current != NULL; i++) {
-        prev = current;
-        current = current->next;
+
+    printf("\n%s entra na fila", student->name);
+
+    if(empty(list)) {
+        list->node = node;
+    } else {
+        Node *position = get_index(list, student->level);
+        node->next = position->next;
+        position->next = node;
+        avoid_starvation(node->next);
     }
-    node->next = current;
-    index != 0 ? (prev->next = node) : (list->node = node);
+
     list->size++;
 }
 
@@ -52,26 +58,41 @@ Node *unlist(List *list, char *name) {
     return current;
 }
 
-int get_index(List *list, Level level) {
-    int i = 0;
-    Node *aux = list->node;
-    while (aux != NULL && (level >= aux->student.level || list->oven_student == aux->student.id)) {
-        aux = aux->next;
-        i++;
+Node *get_index(List *list, Level level) {
+    Node *current = list->node;
+    Node *prev = NULL;
+    while (current != NULL && (level >= current->student.level || list->oven_student == current->student.id)) {
+        prev = current;
+        current = current->next;
     }
-    return i;
+    return prev;
+}
+
+void avoid_starvation(Node *start) {
+    Node *aux = start;
+    while (aux != NULL) {
+        if (aux->student.level != SENIOR) {
+            aux->student.waiting++;
+            if (aux->student.waiting == 2) {
+                aux->student.level--;
+                printf("\n%s subiu de nivel", aux->student.name);
+                fflush(stdout);
+                aux->student.waiting = 0;
+            }
+        }
+        aux = aux->next;
+    }
 }
 
 int input(List *list, Student *student) {
-    int index = get_index(list, student->level);
-    to_list(list, student, index);
-    printf("\n%s entra na fila", student->name);
+    to_list(list, student);
     fflush(stdout);
     return COD_IN;
 }
 
 int output(List *list, Student *student) {
     unlist(list, student->name);
+    reset_attr(student);
     if (!empty(list)) {
         list->oven_student = list->node->student.id;
         int rc = pthread_cond_signal(list->node->student.condition);

@@ -24,4 +24,6 @@ Student *new_student(char* name, Level level);
 
 void create_students(Student *students);
 
+void reset_attr(Student *student);
+
 #endif //OVEN_SHARE_STUDENT_H

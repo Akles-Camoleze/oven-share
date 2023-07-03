@@ -26,16 +26,18 @@ bool full(List *list);
 
 List *new_list();
 
-void to_list(List *list, Student *student, int index);
+void to_list(List *list, Student *student);
 
 Node *unlist(List *list, char *name);
 
-int get_index(List *list, Level level);
+Node *get_index(List *list, Level level);
 
 int input(List *list, Student *student);
 
 int output(List *list, Student *student);
 
 void handler(pthread_mutex_t *list_mutex, List *list, Student *student, int (*operation)(List *, Student *));
+
+void avoid_starvation(Node *start);
 
 #endif //OVEN_SHARE_LIST_H
