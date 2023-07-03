@@ -75,7 +75,7 @@ void avoid_starvation(Node *start) {
             aux->student.waiting++;
             if (aux->student.waiting == 2) {
                 aux->student.level--;
-                printf("\n%s subiu de nivel", aux->student.name);
+                printf("\nFaxineiro detectou INANIÇÃO, aumentando a propriedade de %s", aux->student.name);
                 fflush(stdout);
                 aux->student.waiting = 0;
             }
