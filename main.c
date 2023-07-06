@@ -7,8 +7,9 @@
 #include "ADTs/list/list.h"
 #include "services/services.h"
 
-int student_count;
+int loops;
 List *list;
+int student_count;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t list_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t oven_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -19,7 +20,7 @@ void *task(void *argument) {
 
     await_broadcast(&mutex, &initilize, &student_count);
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < loops; i++) {
         sleep(rand() % 2 + 3);
 
         handler(&list_mutex, list, student, input);
@@ -37,6 +38,10 @@ void *task(void *argument) {
 }
 
 int main(int argc, char **argv) {
+    if (argc < 2) {
+        exit(EXIT_FAILURE);
+    }
+    loops = (int) strtol(argv[1], NULL, 10);
     int rc;
     list = new_list();
     student_count = 0;
